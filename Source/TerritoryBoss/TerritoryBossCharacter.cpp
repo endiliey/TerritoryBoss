@@ -63,6 +63,10 @@ void ATerritoryBossCharacter::SetupPlayerInputComponent(class UInputComponent* P
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("LookUpRate", this, &ATerritoryBossCharacter::LookUpAtRate);
 
+	// Handle zoom in and zoom out for camera
+	PlayerInputComponent->BindAction("ZoomIn", IE_Pressed, this, &ATerritoryBossCharacter::CameraZoomIn);
+	PlayerInputComponent->BindAction("ZoomOut", IE_Pressed, this, &ATerritoryBossCharacter::CameraZoomOut);
+
 	// handle touch devices
 	PlayerInputComponent->BindTouch(IE_Pressed, this, &ATerritoryBossCharacter::TouchStarted);
 	PlayerInputComponent->BindTouch(IE_Released, this, &ATerritoryBossCharacter::TouchStopped);
@@ -125,5 +129,33 @@ void ATerritoryBossCharacter::MoveRight(float Value)
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 		// add movement in that direction
 		AddMovementInput(Direction, Value);
+	}
+}
+
+void ATerritoryBossCharacter::CameraZoomIn()
+{
+	CameraZoom = CameraZoom - 25.0f;
+	if (CameraZoom <= 300.0f)
+	{
+		CameraBoom->TargetArmLength = 300.0f;
+		CameraZoom = 300.0f;
+	}
+	else
+	{
+		CameraBoom->TargetArmLength = CameraZoom;
+	}
+}
+
+void ATerritoryBossCharacter::CameraZoomOut()
+{
+	CameraZoom = CameraZoom + 25.0f;
+	if (CameraZoom >= 400.0f)
+	{
+		CameraBoom->TargetArmLength = 400.0f;
+		CameraZoom = 400.0f;
+	}
+	else
+	{
+		CameraBoom->TargetArmLength = CameraZoom;
 	}
 }

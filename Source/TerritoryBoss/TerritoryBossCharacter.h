@@ -60,6 +60,11 @@ protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	// End of APawn interface
 
+	/** Camera zoom in / zoom out features */
+	void CameraZoomIn();
+	void CameraZoomOut();
+	float CameraZoom = 300.0f;
+
 public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
