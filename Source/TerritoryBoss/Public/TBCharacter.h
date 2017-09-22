@@ -1,10 +1,10 @@
 // Copyright 1998-2017 Epic Games, Inc. All Rights Reserved.
 #pragma once
 #include "GameFramework/Character.h"
-#include "TerritoryBossCharacter.generated.h"
+#include "TBCharacter.generated.h"
 
 UCLASS(config=Game)
-class ATerritoryBossCharacter : public ACharacter
+class ATBCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
@@ -17,7 +17,7 @@ class ATerritoryBossCharacter : public ACharacter
 	class UCameraComponent* FollowCamera;
 
 public:
-	ATerritoryBossCharacter();
+	ATBCharacter();
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")

@@ -2,12 +2,12 @@
 
 #include "TerritoryBoss.h"
 #include "Kismet/HeadMountedDisplayFunctionLibrary.h"
-#include "TerritoryBossCharacter.h"
+#include "TBCharacter.h"
 
 //////////////////////////////////////////////////////////////////////////
-// ATerritoryBossCharacter
+// ATBCharacter
 
-ATerritoryBossCharacter::ATerritoryBossCharacter()
+ATBCharacter::ATBCharacter()
 {
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
@@ -50,42 +50,42 @@ ATerritoryBossCharacter::ATerritoryBossCharacter()
 //////////////////////////////////////////////////////////////////////////
 // Input
 
-void ATerritoryBossCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
+void ATBCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
 	// Set up gameplay key bindings
 	check(PlayerInputComponent);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 
-	PlayerInputComponent->BindAxis("MoveForward", this, &ATerritoryBossCharacter::MoveForward);
-	PlayerInputComponent->BindAxis("MoveRight", this, &ATerritoryBossCharacter::MoveRight);
+	PlayerInputComponent->BindAxis("MoveForward", this, &ATBCharacter::MoveForward);
+	PlayerInputComponent->BindAxis("MoveRight", this, &ATBCharacter::MoveRight);
 
 	// We have 2 versions of the rotation bindings to handle different kinds of devices differently
 	// "turn" handles devices that provide an absolute delta, such as a mouse.
 	// "turnrate" is for devices that we choose to treat as a rate of change, such as an analog joystick
 	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
-	PlayerInputComponent->BindAxis("TurnRate", this, &ATerritoryBossCharacter::TurnAtRate);
+	PlayerInputComponent->BindAxis("TurnRate", this, &ATBCharacter::TurnAtRate);
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
-	PlayerInputComponent->BindAxis("LookUpRate", this, &ATerritoryBossCharacter::LookUpAtRate);
+	PlayerInputComponent->BindAxis("LookUpRate", this, &ATBCharacter::LookUpAtRate);
 
 	// Handle zoom in and zoom out for camera
-	PlayerInputComponent->BindAction("ZoomIn", IE_Pressed, this, &ATerritoryBossCharacter::CameraZoomIn);
-	PlayerInputComponent->BindAction("ZoomOut", IE_Pressed, this, &ATerritoryBossCharacter::CameraZoomOut);
+	PlayerInputComponent->BindAction("ZoomIn", IE_Pressed, this, &ATBCharacter::CameraZoomIn);
+	PlayerInputComponent->BindAction("ZoomOut", IE_Pressed, this, &ATBCharacter::CameraZoomOut);
 }
 
-void ATerritoryBossCharacter::TurnAtRate(float Rate)
+void ATBCharacter::TurnAtRate(float Rate)
 {
 	// calculate delta for this frame from the rate information
 	AddControllerYawInput(Rate * BaseTurnRate * GetWorld()->GetDeltaSeconds());
 }
 
-void ATerritoryBossCharacter::LookUpAtRate(float Rate)
+void ATBCharacter::LookUpAtRate(float Rate)
 {
 	// calculate delta for this frame from the rate information
 	AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
 }
 
-void ATerritoryBossCharacter::MoveForward(float Value)
+void ATBCharacter::MoveForward(float Value)
 {
 	if ((Controller != NULL) && (Value != 0.0f))
 	{
@@ -99,7 +99,7 @@ void ATerritoryBossCharacter::MoveForward(float Value)
 	}
 }
 
-void ATerritoryBossCharacter::MoveRight(float Value)
+void ATBCharacter::MoveRight(float Value)
 {
 	if ( (Controller != NULL) && (Value != 0.0f) )
 	{
@@ -114,7 +114,7 @@ void ATerritoryBossCharacter::MoveRight(float Value)
 	}
 }
 
-void ATerritoryBossCharacter::CameraZoomIn()
+void ATBCharacter::CameraZoomIn()
 {
 	CameraZoom = CameraZoom - 25.0f;
 	if (CameraZoom <= 200.0f)
@@ -128,7 +128,7 @@ void ATerritoryBossCharacter::CameraZoomIn()
 	}
 }
 
-void ATerritoryBossCharacter::CameraZoomOut()
+void ATBCharacter::CameraZoomOut()
 {
 	CameraZoom = CameraZoom + 25.0f;
 	if (CameraZoom >= 400.0f)
