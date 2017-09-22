@@ -122,6 +122,10 @@ protected:
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerSetTargeting(bool NewTargeting);
 
+	UPROPERTY(Transient, Replicated)
+	bool bIsTargeting;
+
+public:
 	/* Is player aiming down sights */
 	UFUNCTION(BlueprintCallable, Category = "Targeting")
 	bool IsTargeting() const;
@@ -132,15 +136,14 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "Targeting")
 	FRotator GetAimOffsets() const;
 
-	UPROPERTY(Transient, Replicated)
-	bool bIsTargeting;
-
 	UPROPERTY(EditDefaultsOnly, Category = "Targeting")
 	float TargetingSpeedModifier;
 
 	/************************************************************************/
 	/* Hitpoints                                                  */
 	/************************************************************************/
+
+protected:
 
 	UFUNCTION(BlueprintCallable, Category = "PlayerCondition")
 	float GetHealth() const;

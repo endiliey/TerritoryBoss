@@ -3,13 +3,16 @@
 #include "TerritoryBoss.h"
 #include "TBGameMode.h"
 #include "TBCharacter.h"
+#include "TBPlayerController.h"
 
 ATBGameMode::ATBGameMode()
 {
 	// set default pawn class to our Blueprinted character
-	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/Character/ThirdPersonCharacter"));
-	if (PlayerPawnBPClass.Class != NULL)
+	static ConstructorHelpers::FClassFinder<APawn> TBPlayerPawnBPClass(TEXT("/Game/Character/ThirdPersonCharacter"));
+	if (TBPlayerPawnBPClass.Class != NULL)
 	{
-		DefaultPawnClass = PlayerPawnBPClass.Class;
+		DefaultPawnClass = TBPlayerPawnBPClass.Class;
 	}
+
+	PlayerControllerClass = ATBPlayerController::StaticClass();
 }

@@ -12,8 +12,6 @@ UCLASS()
 class TERRITORYBOSS_API ATBPlayerController : public APlayerController
 {
 	GENERATED_BODY()
-	
-	
-	
-	
+
+	ATBPlayerController();
 };

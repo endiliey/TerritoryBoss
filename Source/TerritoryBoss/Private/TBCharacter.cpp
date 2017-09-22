@@ -14,7 +14,9 @@ ATBCharacter::ATBCharacter()
 
 	// Configure character movement
 	UCharacterMovementComponent* MoveComp = GetCharacterMovement();
-	MoveComp->JumpZVelocity = 620.f;
+	MoveComp->JumpZVelocity = 600.f;
+	MoveComp->GravityScale = 1.5f;
+	MoveComp->AirControl = 0.2f;
 	MoveComp->bCanWalkOffLedgesWhenCrouching = true;
 	MoveComp->MaxWalkSpeedCrouched = 200;
 
@@ -218,9 +220,15 @@ void ATBCharacter::SetIsJumping(bool NewJumping)
 	{
 		UnCrouch();
 	}
-	else
+	else if (NewJumping != bIsJumping)
 	{
 		bIsJumping = NewJumping;
+
+		if (bIsJumping)
+		{
+			/* Perform the built-in Jump on the character */
+			Jump();
+		}
 	}
 
 	if (Role < ROLE_Authority)
