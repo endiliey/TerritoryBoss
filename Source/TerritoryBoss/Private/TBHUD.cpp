@@ -6,7 +6,7 @@
 
 ATBHUD::ATBHUD()
 {
-	static ConstructorHelpers::FObjectFinder<UTexture2D> HUDCenterDotObj(TEXT("/Game/UI/HUD/T_CenterDot_M.T_CenterDot_M"));
+	static ConstructorHelpers::FObjectFinder<UTexture2D> HUDCenterDotObj(TEXT("/Game/UI/HUD/T_Crosshair_Simple_M.T_Crosshair_Simple_M"));
 	CrosshairIcon = UCanvas::MakeIcon(HUDCenterDotObj.Object);
 }
 
