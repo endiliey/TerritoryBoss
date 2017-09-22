@@ -19,15 +19,8 @@ ATBCharacter::ATBCharacter()
 	BaseTurnRate = 45.f;
 	BaseLookUpRate = 45.f;
 
-	// Don't rotate when the controller rotates. Let that just affect the camera.
-	bUseControllerRotationPitch = true;
-	bUseControllerRotationYaw = true;
-	bUseControllerRotationRoll = true;
-
 	// Configure character movement
 	UCharacterMovementComponent* MoveComp = GetCharacterMovement();
-	MoveComp->bOrientRotationToMovement = true; // Character moves in the direction of input...	
-	MoveComp->RotationRate = FRotator(0.0f, 540.0f, 0.0f); // ...at this rotation rate
 	MoveComp->JumpZVelocity = 620.f;
 	MoveComp->AirControl = 0.2f;
 
