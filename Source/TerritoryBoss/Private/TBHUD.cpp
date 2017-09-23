@@ -8,7 +8,7 @@
 
 ATBHUD::ATBHUD()
 {
-	static ConstructorHelpers::FObjectFinder<UTexture2D> HUDCenterDotObj(TEXT("/Game/UI/HUD/T_CenterDot_M.T_CenterDot_M"));
+	static ConstructorHelpers::FObjectFinder<UTexture2D> HUDCenterDotObj(TEXT("/Game/UI/HUD/FirstPersonCrosshair.FirstPersonCrosshair"));
 	CrosshairIcon = UCanvas::MakeIcon(HUDCenterDotObj.Object);
 }
 
@@ -24,7 +24,7 @@ void ATBHUD::DrawCrosshair()
 	float CenterX = Canvas->ClipX / 2;
 	float CenterY = Canvas->ClipY / 2;
 
-	float CrosshairScale = 0.07f;
+	float CrosshairScale = 1.f;
 
 	ATBPlayerController* PCOwner = Cast<ATBPlayerController>(PlayerOwner);
 	if (PCOwner)
