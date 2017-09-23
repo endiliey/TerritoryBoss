@@ -8,6 +8,8 @@ class ATBCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
+private:
+
 	/** Camera boom positioning to handle camera distance to the character mesh */
 	UPROPERTY(VisibleAnywhere, Category = "Camera")
 	class USpringArmComponent* CameraBoom;
@@ -17,8 +19,10 @@ class ATBCharacter : public ACharacter
 	class UCameraComponent* FollowCamera;
 
 public:
-	ATBCharacter();
 
+	ATBCharacter(const FObjectInitializer& ObjectInitializer);
+
+	// Called after the Actor's components have been initialized
 	virtual void PostInitializeComponents() override;
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
@@ -28,8 +32,6 @@ public:
 	/** Base look up/down rate, in deg/sec. Other scaling may affect final rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 	float BaseLookUpRate;
-
-protected:
 
 	// Bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -92,22 +94,22 @@ protected:
 	/* Object Interaction                                                   */
 	/************************************************************************/
 
-	///* Use the usable actor currently in focus, if any */
-	//virtual void Use();
+	/* Use the usable actor currently in focus, if any */
+	virtual void Use();
 
-	//UFUNCTION(Server, Reliable, WithValidation)
-	//void ServerUse();
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerUse();
 
-	//class ATBUsableActor* GetUsableInView();
+	class ATBUsableActor* GetUsableInView();
 
-	///*Max distance to use/focus on actors. */
-	//UPROPERTY(EditDefaultsOnly, Category = "ObjectInteraction")
-	//float MaxUseDistance;
+	/*Max distance to use/focus on actors. */
+	UPROPERTY(EditDefaultsOnly, Category = "ObjectInteraction")
+	float MaxUseDistance;
 
-	///* True only in first frame when focused on a new usable actor. */
-	//bool bHasNewFocus;
+	/* True only in first frame when focused on a new usable actor. */
+	bool bHasNewFocus;
 
-	//class ATBUsableActor* FocusedUsableActor;
+	class ATBUsableActor* FocusedUsableActor;
 
 	/************************************************************************/
 	/* Targeting                                                            */
@@ -122,10 +124,6 @@ protected:
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerSetTargeting(bool NewTargeting);
 
-	UPROPERTY(Transient, Replicated)
-	bool bIsTargeting;
-
-public:
 	/* Is player aiming down sights */
 	UFUNCTION(BlueprintCallable, Category = "Targeting")
 	bool IsTargeting() const;
@@ -136,14 +134,15 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Targeting")
 	FRotator GetAimOffsets() const;
 
+	UPROPERTY(Transient, Replicated)
+	bool bIsTargeting;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Targeting")
 	float TargetingSpeedModifier;
 
 	/************************************************************************/
 	/* Hitpoints                                                  */
 	/************************************************************************/
-
-protected:
 
 	UFUNCTION(BlueprintCallable, Category = "PlayerCondition")
 	float GetHealth() const;
@@ -167,7 +166,6 @@ protected:
 	/* Take damage & handle death */
 	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser) override;
 
-public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/

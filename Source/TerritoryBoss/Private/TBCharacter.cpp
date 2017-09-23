@@ -3,11 +3,14 @@
 #include "TerritoryBoss.h"
 #include "Kismet/HeadMountedDisplayFunctionLibrary.h"
 #include "TBCharacter.h"
+#include "TBUsableActor.h"
+#include "TBCharacterMovementComponent.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ATBCharacter
 
-ATBCharacter::ATBCharacter()
+ATBCharacter::ATBCharacter(const class FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer.SetDefaultSubobjectClass<UTBCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
 {
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
@@ -34,55 +37,31 @@ ATBCharacter::ATBCharacter()
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 
-	// TODO MaxUseDistance = 800;
-	// TODO bHasNewFocus = true;
+	MaxUseDistance = 800;
+	bHasNewFocus = true;
 	TargetingSpeedModifier = 0.5f;
 	SprintingSpeedModifier = 2.5f;
 
 	Health = 100;
 }
 
-void ATBCharacter::Tick(float DeltaTime)
+void ATBCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
-	Super::Tick(DeltaTime);
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	if (bWantsToRun && !IsSprinting())
-	{
-		SetSprinting(true);
+	// Value is already updated locally, skip in replication step
+	DOREPLIFETIME_CONDITION(ATBCharacter, bWantsToRun, COND_SkipOwner);
+	DOREPLIFETIME_CONDITION(ATBCharacter, bIsTargeting, COND_SkipOwner);
+	DOREPLIFETIME_CONDITION(ATBCharacter, bIsJumping, COND_SkipOwner);
 
-		//if (Controller && Controller->IsLocalController())
-		//{
-		//	ATBUsableActor* Usable = GetUsableInView();
-
-		//	// End Focus
-		//	if (FocusedUsableActor != Usable)
-		//	{
-		//		if (FocusedUsableActor)
-		//		{
-		//			FocusedUsableActor->OnEndFocus();
-		//		}
-
-		//		bHasNewFocus = true;
-		//	}
-
-		//	// Assign new Focus
-		//	FocusedUsableActor = Usable;
-
-		//	// Start Focus.
-		//	if (Usable)
-		//	{
-		//		if (bHasNewFocus)
-		//		{
-		//			Usable->OnBeginFocus();
-		//			bHasNewFocus = false;
-		//		}
-		//	}
-		//}
-	}
+	// Replicate to every client, no special condition required
+	DOREPLIFETIME(ATBCharacter, Health);
 }
 
-//////////////////////////////////////////////////////////////////////////
-// Input
+void ATBCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+}
 
 void ATBCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
@@ -93,7 +72,7 @@ void ATBCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputC
 	PlayerInputComponent->BindAction("SprintHold", IE_Pressed, this, &ATBCharacter::OnStartSprinting);
 	PlayerInputComponent->BindAction("SprintHold", IE_Released, this, &ATBCharacter::OnStopSprinting);
 	PlayerInputComponent->BindAction("CrouchToggle", IE_Pressed, this, &ATBCharacter::OnCrouchToggle);
-	// TODO PlayerInputComponent->BindAction("Use", IE_Pressed, this, &ATBCharacter::Use);
+	PlayerInputComponent->BindAction("Use", IE_Pressed, this, &ATBCharacter::Use);
 	PlayerInputComponent->BindAction("Targeting", IE_Pressed, this, &ATBCharacter::OnStartTargeting);
 	PlayerInputComponent->BindAction("Targeting", IE_Released, this, &ATBCharacter::OnEndTargeting);
 
@@ -101,6 +80,45 @@ void ATBCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputC
 	PlayerInputComponent->BindAxis("MoveRight", this, &ATBCharacter::MoveRight);
 	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
+}
+
+void ATBCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if (bWantsToRun && !IsSprinting())
+	{
+		SetSprinting(true);
+
+		if (Controller && Controller->IsLocalController())
+		{
+			ATBUsableActor* Usable = GetUsableInView();
+
+			// End Focus
+			if (FocusedUsableActor != Usable)
+			{
+				if (FocusedUsableActor)
+				{
+					FocusedUsableActor->OnEndFocus();
+				}
+
+				bHasNewFocus = true;
+			}
+
+			// Assign new Focus
+			FocusedUsableActor = Usable;
+
+			// Start Focus.
+			if (Usable)
+			{
+				if (bHasNewFocus)
+				{
+					Usable->OnBeginFocus();
+					bHasNewFocus = false;
+				}
+			}
+		}
+	}
 }
 
 void ATBCharacter::MoveForward(float Value)
@@ -132,19 +150,6 @@ void ATBCharacter::MoveRight(float Value)
 	}
 }
 
-void ATBCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	// Value is already updated locally, skip in replication step
-	DOREPLIFETIME_CONDITION(ATBCharacter, bWantsToRun, COND_SkipOwner);
-	DOREPLIFETIME_CONDITION(ATBCharacter, bIsTargeting, COND_SkipOwner);
-	DOREPLIFETIME_CONDITION(ATBCharacter, bIsJumping, COND_SkipOwner);
-
-	// Replicate to every client, no special condition required
-	DOREPLIFETIME(ATBCharacter, Health);
-}
-
 void ATBCharacter::OnCrouchToggle()
 {	
 	if (IsSprinting())
@@ -163,11 +168,6 @@ void ATBCharacter::OnCrouchToggle()
 	}
 }
 
-void ATBCharacter::PostInitializeComponents()
-{
-	Super::PostInitializeComponents();
-}
-
 void ATBCharacter::OnStartJump()
 {
 	bPressedJump = true;
@@ -180,22 +180,6 @@ void ATBCharacter::OnStopJump()
 {
 	bPressedJump = false;
 }
-
-void ATBCharacter::SetSprinting(bool NewSprinting)
-{
-	bWantsToRun = NewSprinting;
-
-	if (bIsCrouched)
-		UnCrouch();
-
-	// TODO: Stop weapon fire
-
-	if (Role < ROLE_Authority)
-	{
-		ServerSetSprinting(NewSprinting);
-	}
-}
-
 
 void ATBCharacter::OnStartSprinting()
 {
@@ -247,6 +231,33 @@ bool ATBCharacter::ServerSetIsJumping_Validate(bool NewJumping)
 	return true;
 }
 
+void ATBCharacter::OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode)
+{
+	Super::OnMovementModeChanged(PrevMovementMode, PreviousCustomMode);
+
+	/* Check if we are no longer falling/jumping */
+	if (PrevMovementMode == EMovementMode::MOVE_Falling &&
+		GetCharacterMovement()->MovementMode != EMovementMode::MOVE_Falling)
+	{
+		SetIsJumping(false);
+	}
+}
+
+void ATBCharacter::SetSprinting(bool NewSprinting)
+{
+	bWantsToRun = NewSprinting;
+
+	if (bIsCrouched)
+		UnCrouch();
+
+	// TODO: Stop weapon fire
+
+	if (Role < ROLE_Authority)
+	{
+		ServerSetSprinting(NewSprinting);
+	}
+}
+
 void ATBCharacter::ServerSetSprinting_Implementation(bool NewSprinting)
 {
 	SetSprinting(NewSprinting);
@@ -255,11 +266,6 @@ void ATBCharacter::ServerSetSprinting_Implementation(bool NewSprinting)
 bool ATBCharacter::ServerSetSprinting_Validate(bool NewSprinting)
 {
 	return true;
-}
-
-float ATBCharacter::GetSprintingSpeedModifier() const
-{
-	return SprintingSpeedModifier;
 }
 
 bool ATBCharacter::IsSprinting() const
@@ -272,16 +278,65 @@ bool ATBCharacter::IsSprinting() const
 		&& (GetVelocity().GetSafeNormal2D() | GetActorRotation().Vector()) > 0.8; // Changing this value to 0.1 allows for diagonal sprinting. (holding W+A or W+D keys)
 }
 
-void ATBCharacter::OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode)
+float ATBCharacter::GetSprintingSpeedModifier() const
 {
-	Super::OnMovementModeChanged(PrevMovementMode, PreviousCustomMode);
+	return SprintingSpeedModifier;
+}
 
-	/* Check if we are no longer falling/jumping */
-	if (PrevMovementMode == EMovementMode::MOVE_Falling &&
-		GetCharacterMovement()->MovementMode != EMovementMode::MOVE_Falling)
+void ATBCharacter::Use()
+{
+	// Only allow on server. If called on client push this request to the server
+	if (Role == ROLE_Authority)
 	{
-		SetIsJumping(false);
+		ATBUsableActor* Usable = GetUsableInView();
+		if (Usable)
+		{
+			Usable->OnUsed(this);
+		}
 	}
+	else
+	{
+		ServerUse();
+	}
+}
+
+void ATBCharacter::ServerUse_Implementation()
+{
+	Use();
+}
+
+bool ATBCharacter::ServerUse_Validate()
+{
+	return true;
+}
+
+/*
+Performs ray-trace to find closest looked-at UsableActor.
+*/
+ATBUsableActor* ATBCharacter::GetUsableInView()
+{
+	FVector CamLoc;
+	FRotator CamRot;
+
+	if (Controller == NULL)
+		return NULL;
+
+	Controller->GetPlayerViewPoint(CamLoc, CamRot);
+	const FVector TraceStart = CamLoc;
+	const FVector Direction = CamRot.Vector();
+	const FVector TraceEnd = TraceStart + (Direction * MaxUseDistance);
+
+	FCollisionQueryParams TraceParams(TEXT("TraceUsableActor"), true, this);
+	TraceParams.bTraceAsyncScene = true;
+	TraceParams.bReturnPhysicalMaterial = false;
+
+	/* Not tracing complex uses the rough collision instead making tiny objects easier to select. */
+	TraceParams.bTraceComplex = false;
+
+	FHitResult Hit(ForceInit);
+	GetWorld()->LineTraceSingleByChannel(Hit, TraceStart, TraceEnd, ECC_Visibility, TraceParams);
+
+	return Cast<ATBUsableActor>(Hit.GetActor());
 }
 
 void ATBCharacter::OnStartTargeting()
@@ -325,6 +380,15 @@ float ATBCharacter::GetTargetingSpeedModifier() const
 	return TargetingSpeedModifier;
 }
 
+FRotator ATBCharacter::GetAimOffsets() const
+{
+	const FVector AimDirWS = GetBaseAimRotation().Vector();
+	const FVector AimDirLS = ActorToWorld().InverseTransformVectorNoScale(AimDirWS);
+	const FRotator AimRotLS = AimDirLS.Rotation();
+
+	return AimRotLS;
+}
+
 float ATBCharacter::GetHealth() const
 {
 	return Health;
@@ -346,17 +410,6 @@ bool ATBCharacter::IsAlive() const
 {
 	return Health > 0;
 }
-
-
-FRotator ATBCharacter::GetAimOffsets() const
-{
-	const FVector AimDirWS = GetBaseAimRotation().Vector();
-	const FVector AimDirLS = ActorToWorld().InverseTransformVectorNoScale(AimDirWS);
-	const FRotator AimRotLS = AimDirLS.Rotation();
-
-	return AimRotLS;
-}
-
 
 float ATBCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser)
 {

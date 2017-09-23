@@ -2,7 +2,9 @@
 #pragma once
 #include "TerritoryBoss.h"
 #include "../Public/TBHUD.h"
-
+#include "TBCharacter.h"
+#include "TBPlayerController.h"
+#include "TBUsableActor.h"
 
 ATBHUD::ATBHUD()
 {
@@ -19,9 +21,6 @@ void ATBHUD::DrawHUD()
 
 void ATBHUD::DrawCrosshair()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Draw Crosshair successful"));
-
-	/*
 	float CenterX = Canvas->ClipX / 2;
 	float CenterY = Canvas->ClipY / 2;
 
@@ -30,7 +29,7 @@ void ATBHUD::DrawCrosshair()
 	ATBPlayerController* PCOwner = Cast<ATBPlayerController>(PlayerOwner);
 	if (PCOwner)
 	{
-		ATBCharacter* Pawn = Cast<ASCharacter>(PCOwner->GetPawn());
+		ATBCharacter* Pawn = Cast<ATBCharacter>(PCOwner->GetPawn());
 		if (Pawn) // TODO: && Pawn->IsAlive() (Disabled this check until Death & Respawn is implemented)
 		{
 			// Boost size when hovering over a switchable object.
@@ -44,6 +43,4 @@ void ATBHUD::DrawCrosshair()
 				CenterY - CrosshairIcon.VL*CrosshairScale / 2.0f, CrosshairScale);
 		}
 	}
-	
-	*/
 }

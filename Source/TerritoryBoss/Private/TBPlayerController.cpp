@@ -4,7 +4,6 @@
 #include "TBPlayerController.h"
 #include "TBPlayerCameraManager.h"
 
-
 ATBPlayerController::ATBPlayerController()
 {
 	PlayerCameraManagerClass = ATBPlayerCameraManager::StaticClass();

@@ -24,7 +24,6 @@ void ATBPlayerCameraManager::UpdateCamera(float DeltaTime)
 		DefaultFOV = FMath::FInterpTo(DefaultFOV, TargetFOV, DeltaTime, 20.0f);
 		SetFOV(DefaultFOV);
 	}
-
 	Super::UpdateCamera(DeltaTime);
 }
 
