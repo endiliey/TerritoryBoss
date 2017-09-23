@@ -13,7 +13,7 @@ ATBCharacter::ATBCharacter(const class FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer.SetDefaultSubobjectClass<UTBCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
 {
 	// Set size for collision capsule
-	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
+	GetCapsuleComponent()->InitCapsuleSize(34.f, 88.f);
 
 	// Configure character movement
 	UCharacterMovementComponent* MoveComp = GetCharacterMovement();
