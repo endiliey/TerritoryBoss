@@ -9,7 +9,7 @@
 ATBGameMode::ATBGameMode()
 {
 	// set default pawn class to our Blueprinted character
-	static ConstructorHelpers::FClassFinder<APawn> TBPlayerPawnBPClass(TEXT("/Game/Character/ThirdPersonCharacter"));
+	static ConstructorHelpers::FClassFinder<APawn> TBPlayerPawnBPClass(TEXT("/Game/Blueprints/Pawns/ThirdPersonCharacter"));
 	if (TBPlayerPawnBPClass.Class != NULL)
 	{
 		DefaultPawnClass = TBPlayerPawnBPClass.Class;
