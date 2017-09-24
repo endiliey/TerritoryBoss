@@ -35,7 +35,9 @@ void ATBHUD::DrawCrosshair()
 			// Boost size when hovering over a switchable object.
 			ATBUsableActor* usable = Pawn->GetUsableInView();
 			if (usable)
+			{
 				CrosshairScale *= 1.5f;
+			}
 
 			Canvas->SetDrawColor(255, 255, 255, 255);
 			Canvas->DrawIcon(CrosshairIcon,

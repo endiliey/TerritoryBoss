@@ -12,6 +12,10 @@
 ATBCharacter::ATBCharacter(const class FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer.SetDefaultSubobjectClass<UTBCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
 {
+
+	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	PrimaryActorTick.bCanEverTick = true;
+
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(34.f, 88.f);
 
@@ -89,33 +93,33 @@ void ATBCharacter::Tick(float DeltaTime)
 	if (bWantsToRun && !IsSprinting())
 	{
 		SetSprinting(true);
+	}
 
-		if (Controller && Controller->IsLocalController())
+	if (Controller && Controller->IsLocalController())
+	{
+		ATBUsableActor* Usable = GetUsableInView();
+
+		// End Focus
+		if (FocusedUsableActor != Usable)
 		{
-			ATBUsableActor* Usable = GetUsableInView();
-
-			// End Focus
-			if (FocusedUsableActor != Usable)
+			if (FocusedUsableActor)
 			{
-				if (FocusedUsableActor)
-				{
-					FocusedUsableActor->OnEndFocus();
-				}
-
-				bHasNewFocus = true;
+				FocusedUsableActor->OnEndFocus();
 			}
 
-			// Assign new Focus
-			FocusedUsableActor = Usable;
+			bHasNewFocus = true;
+		}
 
-			// Start Focus.
-			if (Usable)
+		// Assign new Focus
+		FocusedUsableActor = Usable;
+
+		// Start Focus.
+		if (Usable)
+		{
+			if (bHasNewFocus)
 			{
-				if (bHasNewFocus)
-				{
-					Usable->OnBeginFocus();
-					bHasNewFocus = false;
-				}
+				Usable->OnBeginFocus();
+				bHasNewFocus = false;
 			}
 		}
 	}
