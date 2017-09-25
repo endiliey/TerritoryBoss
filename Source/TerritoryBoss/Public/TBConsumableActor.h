@@ -11,7 +11,11 @@
 UCLASS()
 class TERRITORYBOSS_API ATBConsumableActor : public ATBPickupActor
 {
-	GENERATED_UCLASS_BODY()
+	GENERATED_BODY()
+
+public:
+
+	ATBConsumableActor(const FObjectInitializer& ObjectInitializer);
 
 protected:
 

@@ -8,12 +8,14 @@
 UCLASS()
 class TERRITORYBOSS_API ATBUsableActor : public AActor
 {
-	GENERATED_UCLASS_BODY()
+	GENERATED_BODY()
+
+public:
+
+	ATBUsableActor(const FObjectInitializer& ObjectInitializer);
 
 	UPROPERTY(VisibleAnywhere, Category = "Mesh")
 	UStaticMeshComponent* MeshComp;
-
-public:
 
 	/* Player is looking at */
 	virtual void OnBeginFocus();

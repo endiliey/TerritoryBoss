@@ -11,7 +11,11 @@
 UCLASS()
 class TERRITORYBOSS_API ATBPickupActor : public ATBUsableActor
 {
-	GENERATED_UCLASS_BODY()
+	GENERATED_BODY()
+
+public:
+
+	ATBPickupActor(const FObjectInitializer& ObjectInitializer);
 
 	void BeginPlay() override;
 
