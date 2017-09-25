@@ -127,7 +127,7 @@ void ATBCharacter::Tick(float DeltaTime)
 
 void ATBCharacter::MoveForward(float Value)
 {
-	if ((Controller != NULL) && (Value != 0.0f))
+	if ((Controller != nullptr) && (Value != 0.0f))
 	{
 		// find out which way is forward
 		const FRotator Rotation = Controller->GetControlRotation();
@@ -141,7 +141,7 @@ void ATBCharacter::MoveForward(float Value)
 
 void ATBCharacter::MoveRight(float Value)
 {
-	if ( (Controller != NULL) && (Value != 0.0f) )
+	if ( (Controller != nullptr) && (Value != 0.0f) )
 	{
 		// find out which way is right
 		const FRotator Rotation = Controller->GetControlRotation();
@@ -322,8 +322,8 @@ ATBUsableActor* ATBCharacter::GetUsableInView()
 	FVector CamLoc;
 	FRotator CamRot;
 
-	if (Controller == NULL)
-		return NULL;
+	if (Controller == nullptr)
+		return nullptr;
 
 	Controller->GetPlayerViewPoint(CamLoc, CamRot);
 	const FVector TraceStart = CamLoc;

@@ -5,7 +5,7 @@
 #include "GameFramework/Actor.h"
 #include "TBUsableActor.generated.h"
 
-UCLASS()
+UCLASS(abstract)
 class TERRITORYBOSS_API ATBUsableActor : public AActor
 {
 	GENERATED_BODY()

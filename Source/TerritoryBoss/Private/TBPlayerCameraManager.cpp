@@ -17,7 +17,7 @@ ATBPlayerCameraManager::ATBPlayerCameraManager()
 
 void ATBPlayerCameraManager::UpdateCamera(float DeltaTime)
 {
-	ATBCharacter* MyPawn = PCOwner ? Cast<ATBCharacter>(PCOwner->GetPawn()) : NULL;
+	ATBCharacter* MyPawn = PCOwner ? Cast<ATBCharacter>(PCOwner->GetPawn()) : nullptr;
 	if (MyPawn)
 	{
 		const float TargetFOV = MyPawn->IsTargeting() ? TargetingFOV : NormalFOV;
