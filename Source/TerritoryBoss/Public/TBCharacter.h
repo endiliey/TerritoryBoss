@@ -1,6 +1,7 @@
 // Copyright 1998-2017 Epic Games, Inc. All Rights Reserved.
 #pragma once
 #include "GameFramework/Character.h"
+#include "TBTypes.h"
 #include "TBCharacter.generated.h"
 
 UCLASS(config=Game)
@@ -25,19 +26,18 @@ public:
 	// Called after the Actor's components have been initialized
 	virtual void PostInitializeComponents() override;
 
-	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
-	float BaseTurnRate;
-
-	/** Base look up/down rate, in deg/sec. Other scaling may affect final rate. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
-	float BaseLookUpRate;
-
 	// Bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	// Called every frame
 	virtual void Tick(float DeltaSeconds) override;
+
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
+	virtual void PawnClientRestart() override;
+
+	/* Stop playing all montages */
+	void StopAllAnimMontages();
 
 	/************************************************************************/
 	/* Movement                                                             */
@@ -165,6 +165,133 @@ public:
 
 	/* Take damage & handle death */
 	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser) override;
+
+	virtual bool CanDie(float KillingDamage, FDamageEvent const& DamageEvent, AController* Killer, AActor* DamageCauser) const;
+
+	virtual bool Die(float KillingDamage, FDamageEvent const& DamageEvent, AController* Killer, AActor* DamageCauser);
+
+	virtual void OnDeath(float KillingDamage, FDamageEvent const& DamageEvent, APawn* PawnInstigator, AActor* DamageCauser);
+
+	virtual void FellOutOfWorld(const class UDamageType& DmgType) override;
+
+	void SetRagdollPhysics();
+
+	virtual void PlayHit(float DamageTaken, struct FDamageEvent const& DamageEvent, APawn* PawnInstigator, AActor* DamageCauser, bool bKilled);
+
+	void ReplicateHit(float DamageTaken, struct FDamageEvent const& DamageEvent, APawn* PawnInstigator, AActor* DamageCauser, bool bKilled);
+
+	/* Holds hit data to replicate hits and death to clients */
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_LastTakeHitInfo)
+	struct FTakeHitInfo LastTakeHitInfo;
+
+	UFUNCTION()
+	void OnRep_LastTakeHitInfo();
+
+	bool bIsDying;
+
+	/************************************************************************/
+	/* Weapons & Inventory                                                  */
+	/************************************************************************/
+
+private:
+
+	/* Attachpoint for active weapon/item in hands */
+	UPROPERTY(EditDefaultsOnly, Category = "Sockets")
+	FName WeaponAttachPoint;
+
+	/* Attachpoint for items carried on the belt/pelvis. */
+	UPROPERTY(EditDefaultsOnly, Category = "Sockets")
+	FName PelvisAttachPoint;
+
+	/* Attachpoint for primary weapons */
+	UPROPERTY(EditDefaultsOnly, Category = "Sockets")
+	FName SpineAttachPoint;
+
+	bool bWantsToFire;
+
+	/* Distance away from character when dropping inventory items. */
+	UPROPERTY(EditDefaultsOnly, Category = "Inventory")
+	float DropItemDistance;
+
+	/* Mapped to input */
+	void OnStartFire();
+
+	/* Mapped to input */
+	void OnStopFire();
+
+	/* Mapped to input */
+	void OnNextWeapon();
+
+	/* Mapped to input */
+	void OnPrevWeapon();
+
+	/* Mapped to input */
+	void OnEquipPrimaryWeapon();
+
+	/* Mapped to input */
+	void OnEquipSecondaryWeapon();
+
+	void StartWeaponFire();
+
+	void StopWeaponFire();
+
+	void DestroyInventory();
+
+	/* Mapped to input. Drops current weapon */
+	void DropWeapon();
+
+	UFUNCTION(Reliable, Server, WithValidation)
+	void ServerDropWeapon();
+
+	/* Inventory is dropped on death */
+	//void DropInventory();
+
+public:
+
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+	ATBWeapon* GetCurrentWeapon() const;
+
+	/* Check if the specified slot is available, limited to one item per type (primary, secondary) */
+	bool WeaponSlotAvailable(EInventorySlot CheckSlot);
+
+	/* Check if pawn is allowed to fire weapon */
+	bool CanFire() const;
+
+	bool CanReload() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+	bool IsFiring() const;
+
+	/* Return socket name for attachments (to match the socket in the character skeleton) */
+	FName GetInventoryAttachPoint(EInventorySlot Slot) const;
+
+	/* All weapons/items the player currently holds */
+	UPROPERTY(Transient, Replicated)
+	TArray<ATBWeapon*> Inventory;
+
+	void SpawnDefaultInventory();
+
+	void SetCurrentWeapon(class ATBWeapon* newWeapon, class ATBWeapon* LastWeapon = nullptr);
+
+	void EquipWeapon(ATBWeapon* Weapon);
+
+	UFUNCTION(Reliable, Server, WithValidation)
+	void ServerEquipWeapon(ATBWeapon* Weapon);
+
+	/* OnRep functions can use a parameter to hold the previous value of the variable. Very useful when you need to handle UnEquip etc. */
+	UFUNCTION()
+	void OnRep_CurrentWeapon(ATBWeapon* LastWeapon);
+
+	void AddWeapon(class ATBWeapon* Weapon);
+
+	void RemoveWeapon(class ATBWeapon* Weapon);
+
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_CurrentWeapon)
+	class ATBWeapon* CurrentWeapon;
+
+	/* The default weapons to spawn with */
+	UPROPERTY(EditDefaultsOnly, Category = Inventory)
+	TArray<TSubclassOf<class ATBWeapon>> DefaultInventoryClasses;
 
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }

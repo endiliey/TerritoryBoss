@@ -15,6 +15,7 @@ ATBUsableActor::ATBUsableActor(const class FObjectInitializer& ObjectInitializer
 void ATBUsableActor::OnUsed(APawn* InstigatorPawn)
 {
 	// TODO ..
+	Destroy();
 }
 
 void ATBUsableActor::OnBeginFocus()

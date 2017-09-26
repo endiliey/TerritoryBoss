@@ -12,7 +12,7 @@ enum class EInventorySlot : uint8
 	/* For primary weapons on spine bone */
 	Primary,
 
-	/* Storage for small items like flashlight on pelvis */
+	/* Storage for small items on pelvis */
 	Secondary,
 };
 
