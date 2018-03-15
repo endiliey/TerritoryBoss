@@ -1,11 +1,8 @@
 # Territory Boss
 Territory Boss is an upcoming **free-to-play** multiplayer battle royal third-person shooter game
 
-## Demo
+## Latest Short Demo
 [![Character Movement](demo.png)](https://youtu.be/eYM2Y440_BE)
-
-1. [23/09/2017](https://youtu.be/_bWkzGA7JhM)
-2. [26/09/2017](https://youtu.be/eYM2Y440_BE)
 
 ## Before you get started
 
