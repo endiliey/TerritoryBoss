@@ -1,5 +1,5 @@
 # Territory Boss
-Territory Boss is an upcoming **free-to-play** multiplayer battle royal third-person shooter game
+Territory Boss is a basic third-person shooter game.
 
 ## Latest Short Demo
 [![Character Movement](demo.png)](https://youtu.be/eYM2Y440_BE)
@@ -37,3 +37,6 @@ Be sure to have [Xcode 5.1](https://itunes.apple.com/us/app/xcode/id497799835) i
 - You can now open up **TerritoryBoss.uproject** from the cloned folder to open all the files
 - You can easily **submit contributions** back up to your **fork**. 
 - When you're ready to send the changes for review, simply create a [Pull Request](https://help.github.com/articles/using-pull-requests).
+
+# Disclaimer
+This is a project developed many years ago and not meant to be developed further
